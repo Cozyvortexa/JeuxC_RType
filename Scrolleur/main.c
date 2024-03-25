@@ -43,6 +43,7 @@ void clearRendu(SDL_Renderer* renderer) {
 
 
 int main() {
+	printf("hello");
 	return 0;
 }
 
