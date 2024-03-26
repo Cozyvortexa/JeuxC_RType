@@ -139,6 +139,12 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
         else if (*player1_right && *x + longueurplayer <= 800) {
             *x += dx;
         }
+        // Gestion des tirs de laser
+        else if (*player1_shoot && *laserCount < MAX_LASER) {
+            SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
+            lasers[*laserCount] = laser;
+            *laserCount += 1;
+        }
         *y -= dy;
     }
     else if (*player1_down && *y + largeurplayer <= 600) {
@@ -148,12 +154,30 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
         else if (*player1_right && *x + longueurplayer <= 800) {
             *x += dx;
         }
+        // Gestion des tirs de laser
+        if (*player1_shoot && *laserCount < MAX_LASER) {
+            SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
+            lasers[*laserCount] = laser;
+            *laserCount += 1;
+        }
         *y += dy;
     }
     else if (*player1_left && *x >= 0) {
+        // Gestion des tirs de laser
+        if (*player1_shoot && *laserCount < MAX_LASER) {
+            SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
+            lasers[*laserCount] = laser;
+            *laserCount += 1;
+        }
         *x -= dx;
     }
     else if (*player1_right && *x + longueurplayer <= 800) {
+        // Gestion des tirs de laser
+        if (*player1_shoot && *laserCount < MAX_LASER) {
+            SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
+            lasers[*laserCount] = laser;
+            *laserCount += 1;
+        }
         *x += dx;
     }
 
