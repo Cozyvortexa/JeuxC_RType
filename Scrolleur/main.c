@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <SDL_ttf.h>
 #include <SDL_image.h>
+#include <time.h>
+
 
 #define LONGUEUR_LASER 10
 #define LARGEUR_LASER 10
@@ -115,9 +117,15 @@ void mouvement(SDL_Event evenement, int* player1_up, int* player1_down, int* pla
 }
 
 void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* player1_down, int* player1_left, int* player1_right, int* player1_shoot, int* y, int* x, int longueurplayer, int largeurplayer, int dy, int dx, SDL_Rect* lasers, int* laserCount) {
+    static int shootDelay = 300; // Délai entre chaque tir en millisecondes
+    static Uint32 lastShootTime = 0; // Temps du dernier tir
     // Gestion des événements
     SDL_Event event;
 
+    // Calcul du temps écoulé depuis le dernier tir en millisecondes
+    Uint32 currentTime = SDL_GetTicks();
+    Uint32 elapsedTime = currentTime - lastShootTime;
+    
     // Récupération de tous les événements en attente
     while (SDL_PollEvent(&event) != 0) {
         if (event.type == SDL_QUIT) {
@@ -140,10 +148,11 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
             *x += dx;
         }
         // Gestion des tirs de laser
-        else if (*player1_shoot && *laserCount < MAX_LASER) {
+        if (*player1_shoot && *laserCount < MAX_LASER && elapsedTime >= shootDelay) {
             SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
             lasers[*laserCount] = laser;
             *laserCount += 1;
+            lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
         }
         *y -= dy;
     }
@@ -155,37 +164,40 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
             *x += dx;
         }
         // Gestion des tirs de laser
-        if (*player1_shoot && *laserCount < MAX_LASER) {
+        if (*player1_shoot && *laserCount < MAX_LASER && elapsedTime >= shootDelay) {
             SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
             lasers[*laserCount] = laser;
             *laserCount += 1;
+            lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
         }
         *y += dy;
     }
     else if (*player1_left && *x >= 0) {
         // Gestion des tirs de laser
-        if (*player1_shoot && *laserCount < MAX_LASER) {
+        if (*player1_shoot && *laserCount < MAX_LASER && elapsedTime >= shootDelay) {
             SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
             lasers[*laserCount] = laser;
             *laserCount += 1;
+            lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
         }
         *x -= dx;
     }
     else if (*player1_right && *x + longueurplayer <= 800) {
         // Gestion des tirs de laser
-        if (*player1_shoot && *laserCount < MAX_LASER) {
+        if (*player1_shoot && *laserCount < MAX_LASER && elapsedTime >= shootDelay) {
             SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
             lasers[*laserCount] = laser;
             *laserCount += 1;
+            lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
         }
         *x += dx;
     }
-
     // Gestion des tirs de laser
-    if (*player1_shoot && *laserCount < MAX_LASER) {
+    else if (*player1_shoot && *laserCount < MAX_LASER && elapsedTime >= shootDelay) {
         SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
         lasers[*laserCount] = laser;
         *laserCount += 1;
+        lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
     }
 }
 
@@ -205,8 +217,8 @@ int main() {
     int longueurplayer = 100;
 
     // Vitesse de déplacement
-    int dy = 15;
-    int dx = 15;
+    int dy = 10;
+    int dx = 10;
 
     // Tableau de lasers
     SDL_Rect lasers[MAX_LASER];
