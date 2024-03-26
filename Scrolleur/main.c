@@ -4,6 +4,11 @@
 #include <SDL_ttf.h>
 #include <SDL_image.h>
 
+#define LONGUEUR_LASER 10
+#define LARGEUR_LASER 10
+#define DX_LASER 20
+#define MAX_LASER 10
+
 void initSDL() {
     // Initialisation de SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -89,7 +94,6 @@ SDL_Rect draw(SDL_Renderer* renderer, int x, int y, int longueurplayer, int larg
     return gameobj;
 }
 
-
 void mouvement(SDL_Event evenement, int* player1_up, int* player1_down, int* player1_right, int* player1_left, int* player1_shoot, int valeur) {
     switch (evenement.key.keysym.sym) {
     case SDLK_z:
@@ -107,22 +111,10 @@ void mouvement(SDL_Event evenement, int* player1_up, int* player1_down, int* pla
     case SDLK_SPACE:
         *player1_shoot = valeur;
         break;
-    //case SDLK_UP:
-    //    *player1_up = valeur;
-    //    break;
-    //case SDLK_DOWN:
-    //    *player1_down = valeur;
-    //    break;
-    //case SDLK_RIGHT:
-    //    *player1_right = valeur;
-    //    break;
-    //case SDLK_LEFT:
-    //    *player1_left = valeur;
-    //    break;
     }
 }
 
-void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* player1_down,int* player1_left, int* player1_right,int* player1_shoot, int* y,int* x, int largeurplayer, int longueurplayer, int dy, int dx) {
+void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* player1_down, int* player1_left, int* player1_right, int* player1_shoot, int* y, int* x, int longueurplayer, int largeurplayer, int dy, int dx, SDL_Rect* lasers, int* laserCount) {
     // Gestion des événements
     SDL_Event event;
 
@@ -141,7 +133,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
 
     // Gestion des mouvements des joueurs
     if (*player1_up && *y >= 0) {
-        if (*player1_left && *x >= 0){
+        if (*player1_left && *x >= 0) {
             *x -= dx;
         }
         else if (*player1_right && *x + longueurplayer <= 800) {
@@ -165,7 +157,14 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
         *x += dx;
     }
 
+    // Gestion des tirs de laser
+    if (*player1_shoot && *laserCount < MAX_LASER) {
+        SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
+        lasers[*laserCount] = laser;
+        *laserCount += 1;
+    }
 }
+
 
 int main() {
     // Variables de mouvement des joueurs
@@ -181,15 +180,13 @@ int main() {
     int largeurplayer = 100;
     int longueurplayer = 100;
 
-    int xlaser = x;
-    int ylaser = y + 200;
-    int longueurlaser = 10;
-    int largeurlaser = 10;
-
     // Vitesse de déplacement
     int dy = 15;
     int dx = 15;
-    int dxlaser = 20;
+
+    // Tableau de lasers
+    SDL_Rect lasers[MAX_LASER];
+    int laserCount = 0;
 
     // Variable pour la boucle principale
     int continuer = 1;
@@ -203,40 +200,33 @@ int main() {
     // Création du rendu
     SDL_Renderer* renderer = initRenderer(window);
 
-    //Création de l'image Player
-    SDL_Texture* texture = loadTexture("C:/Users/qrecco/Documents/Projet c/JeuxC_RType/Image/Player1.png", renderer);
-
     // Initialisation de SDL_ttf
     initTTF();
 
-    int laser_active = 0; // Ajout d'une variable pour indiquer si le laser est actif
+    // Chargement de la texture du joueur
+    SDL_Texture* texture = loadTexture("C:/Users/quant/OneDrive/Documents/GitHub/JeuxC_RType/Image/Player1.png", renderer);
 
     // Boucle principale
     while (continuer) {
         // Effacement du rendu
         clearRenderer(renderer);
+
         // Gestion des événements et des mouvements
-        controller(renderer, &continuer, &player1_up, &player1_down, &player1_left, &player1_right, &player1_shoot, &y, &x, longueurplayer, largeurplayer, dy, dx);
+        controller(renderer, &continuer, &player1_up, &player1_down, &player1_left, &player1_right, &player1_shoot, &y, &x, longueurplayer, largeurplayer, dy, dx, lasers, &laserCount);
 
-        // Si le joueur tire et que le laser n'est pas déjà actif
-        if (player1_shoot && !laser_active) {
-            xlaser = x+largeurplayer; // Position initiale du laser (horizontale)
-            ylaser = (y + (longueurplayer/2))-(longueurlaser/2); // Position initiale du laser (verticale)
-            laser_active = 1; // Activer le laser
-        }
-
-        // Si le laser est actif, affichez-le et faites-le avancer
-        if (laser_active) {
-            SDL_Rect laserRect = draw(renderer, xlaser, ylaser, longueurlaser, largeurlaser, 255, 0, 0); // Affichage du laser
-            SDL_RenderFillRect(renderer, &laserRect); // Affichage du rectangle du laser sur le rendu
-            xlaser += dxlaser; // Déplacement horizontal du laser
-            if (xlaser > 800) { // Si le laser sort de l'écran
-                laser_active = 0; // Désactiver le laser
+        // Gestion des lasers
+        for (int i = 0; i < laserCount; ++i) {
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            SDL_RenderFillRect(renderer, &lasers[i]);
+            lasers[i].x += DX_LASER;
+            if (lasers[i].x > 800) {
+                // Supprimer le laser qui a quitté l'écran en le remplaçant par le dernier laser du tableau
+                lasers[i] = lasers[laserCount - 1];
+                laserCount--;
             }
         }
 
-
-        // Dessiner les joueurs
+        // Dessiner le joueur
         renderTexture(texture, renderer, x, y, longueurplayer, largeurplayer);
 
         // Mettre à jour l'affichage
@@ -245,9 +235,6 @@ int main() {
         // Pause courte pour éviter une utilisation excessive du processeur
         SDL_Delay(10);
     }
-
-
-
 
     // Libération des ressources
     freeAll(renderer, window);
