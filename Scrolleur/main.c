@@ -187,7 +187,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
             lasers[*laserCount] = laser;
             *laserCount += 1;
             lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
-            Mix_PlayChannel(-1,laserbeam, 1);
+            Mix_PlayChannel(-1,laserbeam, 0);
         }
         *y -= dy;
     }
@@ -204,7 +204,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
             lasers[*laserCount] = laser;
             *laserCount += 1;
             lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
-            Mix_PlayChannel(-1,laserbeam, 1);
+            Mix_PlayChannel(-1,laserbeam, 0);
         }
         *y += dy;
     }
@@ -215,7 +215,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
             lasers[*laserCount] = laser;
             *laserCount += 1;
             lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
-            Mix_PlayChannel(-1,laserbeam, 1);
+            Mix_PlayChannel(-1,laserbeam, 0);
         }
         *x -= dx;
     }
@@ -226,7 +226,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
             lasers[*laserCount] = laser;
             *laserCount += 1;
             lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
-            Mix_PlayChannel(-1,laserbeam, 1);
+            Mix_PlayChannel(-1,laserbeam, 0);
         }
         *x += dx;
     }
@@ -236,7 +236,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
         lasers[*laserCount] = laser;
         *laserCount += 1;
         lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
-        Mix_PlayChannel(-1,laserbeam, 1);
+        Mix_PlayChannel(-1,laserbeam, 0);
     }
 }
 
