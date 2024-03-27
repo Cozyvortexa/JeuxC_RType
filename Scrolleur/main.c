@@ -202,15 +202,37 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
 }
 
 
-void tapisbackground(SDL_Renderer* renderer, int* xbackground, int* ybackground, int* dxbackground) {
-    SDL_Texture* texturefond1 = loadTexture("../Image/Background/parallax-space-backgound.png", renderer);
-    SDL_Texture* texturefond2 = loadTexture("../Image/Background/parallax-space-stars.png", renderer);
+void tapisbackground(SDL_Renderer* renderer, int* xbackground, int* ybackground, int* xbackgroundplanet, int* xbackgroundetoile) {
+    int dxstar = -3;
+    int dxplanetloin = -2;
+    int dxetoile = -1;
 
-    renderTexture(texturefond1, renderer, 0, 0, 1920, 1080);
-    renderTexture(texturefond2, renderer, *xbackground, *ybackground, 1920, 1080);
-    *xbackground += *dxbackground;
+
+    SDL_Texture* texturefond = loadTexture("../Image/Background/parallax-space-backgound.png", renderer);
+    SDL_Texture* texturepoudre = loadTexture("../Image/Background/parallax-space-stars.png", renderer);
+    SDL_Texture* textureplanetloin = loadTexture("../Image/Background/parallax-space-far-planets.png", renderer);
+    SDL_Texture* textureetoile = loadTexture("../Image/Background/parallax-space-ring-planet.png", renderer);
+    SDL_Texture* textureplanetproche = loadTexture("../Image/Background/parallax-space-big-planet.png", renderer);
+
+
+    renderTexture(texturefond, renderer, 0, 0, 1920, 1080);
+    renderTexture(textureetoile, renderer, *xbackgroundetoile, *ybackground, 255, 575);
+    renderTexture(textureplanetproche, renderer, *xbackgroundetoile+1000, *ybackground+500, 440, 435);
+    renderTexture(textureplanetloin, renderer, *xbackgroundplanet, *ybackground, 1920, 1080);
+    renderTexture(texturepoudre, renderer, *xbackground, *ybackground, 1920, 1080);
+    renderTexture(texturepoudre, renderer, *xbackground+1920, *ybackground, 1920, 1080);
+    
+    *xbackground += dxstar;
     if (*xbackground<=(- 1920)) {
-        *xbackground = 1920;
+        *xbackground = 0;
+    }
+    *xbackgroundplanet += dxplanetloin;
+    if (*xbackgroundplanet <= (-1920)) {
+        *xbackgroundplanet = 1920;
+    }
+    *xbackgroundetoile += dxetoile;
+    if (*xbackgroundetoile <= (-1920)) {
+        *xbackgroundetoile = 1920;
     }
 }
 
@@ -236,11 +258,13 @@ int main() {
     //variable background
     int xbackground = 0;
     int ybackground = 0;
-    int dxbackground = -1;
+    int xbackgroundplanet = 0;
+    int xbackgroundetoile = 2000;
+    
     
     // Tableau de lasers
     SDL_Rect lasers[MAX_LASER];
-    int laserCount = 0;
+    int laserCount = 0; 
     // Variable pour la boucle principale
     int continuer = 1;
     
@@ -258,7 +282,7 @@ int main() {
         // Effacement du rendu
         clearRenderer(renderer);
 
-        tapisbackground(renderer, &xbackground, &ybackground, &dxbackground);
+        tapisbackground(renderer, &xbackground, &ybackground, &xbackgroundplanet, &xbackgroundetoile);
 
 
         // Gestion des événements et des mouvements
