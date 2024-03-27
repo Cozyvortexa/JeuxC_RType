@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <SDL_ttf.h>
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 #include <time.h>
 
 
@@ -45,6 +46,22 @@ SDL_Renderer* initRenderer(SDL_Window* window) {
     return renderer;
 }
 
+int initAudio() {
+    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+        printf("Erreur lors de l'initialisation de SDL : %s\n", SDL_GetError());
+        return 1;
+    }
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 3, 2048) < 0) {
+        printf("Erreur lors de l'initialisation de SDL Mixer : %s\n", Mix_GetError());
+        SDL_Quit(); // Assurez-vous de quitter SDL en cas d'échec
+        return 1;
+    }
+    return 0;
+}
+
+
+
+
 int initTTF() {
     // Initialisation de SDL_ttf
     if (TTF_Init() == -1) {
@@ -55,8 +72,10 @@ int initTTF() {
     return 0;
 }
 
-void freeAll(SDL_Renderer* renderer, SDL_Window* window) {
+void freeAll(SDL_Renderer* renderer, SDL_Window* window, Mix_Music* musique) {
     // Libération des ressources SDL
+    Mix_FreeMusic(musique);
+    Mix_CloseAudio();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_Quit();
@@ -73,16 +92,27 @@ SDL_Texture* loadTexture(const char* path, SDL_Renderer* renderer) {
     SDL_Surface* surface = IMG_Load(path);
     if (!surface) {
         printf("Erreur lors du chargement de l'image : %s\n", IMG_GetError());
-        exit(1);
+        return NULL; // Retourne NULL pour indiquer une erreur
     }
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface); // Libérer la surface, nous n'en avons plus besoin
     if (!texture) {
         printf("Erreur lors de la création de la texture : %s\n", SDL_GetError());
-        exit(1);
+        return NULL; // Retourne NULL pour indiquer une erreur
     }
     return texture;
 }
+
+
+Mix_Music* loadAudio(const char* path) {
+    Mix_Music* musique = Mix_LoadMUS(path);
+    if (!musique) {
+        printf("Erreur lors du chargement de la musique : %s\n", Mix_GetError());
+        return NULL;
+    }
+    return musique;
+}
+
 
 void renderTexture(SDL_Texture* texture, SDL_Renderer* renderer, int x, int y, int width, int height) {
     SDL_Rect destRect = { x, y, width, height }; // Utilisez les dimensions spécifiées
@@ -272,10 +302,14 @@ int main() {
     initSDL();
     SDL_Window* window = initWindow();
     SDL_Renderer* renderer = initRenderer(window);
+    initAudio();
     initTTF();
 
-    // Chargement des textures
+    // Chargement des textures et des sons
     SDL_Texture* textureplayer = loadTexture("../Image/Player1.png", renderer);
+    Mix_Music* musique = loadAudio("../Son/8-Bit Robotics.wav");
+    Mix_PlayMusic(musique, -1);
+
 
     // Boucle principale
     while (continuer) {
@@ -310,7 +344,7 @@ int main() {
     }
 
     // Libération des ressources
-    freeAll(renderer, window);
+    freeAll(renderer, window, musique);
 
     return 0;
 }
