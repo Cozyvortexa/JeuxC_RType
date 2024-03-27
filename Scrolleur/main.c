@@ -59,9 +59,6 @@ int initAudio() {
     return 0;
 }
 
-
-
-
 int initTTF() {
     // Initialisation de SDL_ttf
     if (TTF_Init() == -1) {
@@ -103,14 +100,21 @@ SDL_Texture* loadTexture(const char* path, SDL_Renderer* renderer) {
     return texture;
 }
 
-
-Mix_Music* loadAudio(const char* path) {
+Mix_Music* loadMusic(const char* path) {
     Mix_Music* musique = Mix_LoadMUS(path);
     if (!musique) {
         printf("Erreur lors du chargement de la musique : %s\n", Mix_GetError());
         return NULL;
     }
     return musique;
+}
+Mix_Chunk* loadSon(const char* path) {
+    Mix_Chunk* son = Mix_LoadWAV(path);
+    if (!son) {
+        printf("Erreur lors du chargement du chunk : %s\n", Mix_GetError());
+        return NULL;
+    }
+    return son;
 }
 
 
@@ -146,7 +150,7 @@ void mouvement(SDL_Event evenement, int* player1_up, int* player1_down, int* pla
     }
 }
 
-void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* player1_down, int* player1_left, int* player1_right, int* player1_shoot, int* y, int* x, int longueurplayer, int largeurplayer, int dy, int dx, SDL_Rect* lasers, int* laserCount) {
+void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* player1_down, int* player1_left, int* player1_right, int* player1_shoot, int* y, int* x, int longueurplayer, int largeurplayer, int dy, int dx, SDL_Rect* lasers, int* laserCount, Mix_Chunk* laserbeam) {
     static int shootDelay = 300; // Délai entre chaque tir en millisecondes
     static Uint32 lastShootTime = 0; // Temps du dernier tir
     // Gestion des événements
@@ -183,6 +187,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
             lasers[*laserCount] = laser;
             *laserCount += 1;
             lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
+            Mix_PlayChannel(-1,laserbeam, 1);
         }
         *y -= dy;
     }
@@ -199,6 +204,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
             lasers[*laserCount] = laser;
             *laserCount += 1;
             lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
+            Mix_PlayChannel(-1,laserbeam, 1);
         }
         *y += dy;
     }
@@ -209,6 +215,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
             lasers[*laserCount] = laser;
             *laserCount += 1;
             lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
+            Mix_PlayChannel(-1,laserbeam, 1);
         }
         *x -= dx;
     }
@@ -219,6 +226,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
             lasers[*laserCount] = laser;
             *laserCount += 1;
             lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
+            Mix_PlayChannel(-1,laserbeam, 1);
         }
         *x += dx;
     }
@@ -228,6 +236,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
         lasers[*laserCount] = laser;
         *laserCount += 1;
         lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
+        Mix_PlayChannel(-1,laserbeam, 1);
     }
 }
 
@@ -307,8 +316,10 @@ int main() {
 
     // Chargement des textures et des sons
     SDL_Texture* textureplayer = loadTexture("../Image/Player1.png", renderer);
-    Mix_Music* musique = loadAudio("../Son/8-Bit Robotics.wav");
+    Mix_Music* musique = loadMusic("../Son/8-Bit Robotics.wav");
+    Mix_Chunk* laserbeam = loadSon("../Son/laser-gun.wav");
     Mix_PlayMusic(musique, -1);
+
 
 
     // Boucle principale
@@ -320,7 +331,7 @@ int main() {
 
 
         // Gestion des événements et des mouvements
-        controller(renderer, &continuer, &player1_up, &player1_down, &player1_left, &player1_right, &player1_shoot, &y, &x, longueurplayer, largeurplayer, dy, dx, lasers, &laserCount);
+        controller(renderer, &continuer, &player1_up, &player1_down, &player1_left, &player1_right, &player1_shoot, &y, &x, longueurplayer, largeurplayer, dy, dx, lasers, &laserCount, laserbeam);
 
         // Gestion des lasers
         for (int i = 0; i < laserCount; ++i) {
