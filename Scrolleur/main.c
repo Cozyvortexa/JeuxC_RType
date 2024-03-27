@@ -202,12 +202,16 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
 }
 
 
-void tapisbackground(SDL_Renderer* renderer) {
+void tapisbackground(SDL_Renderer* renderer, int* xbackground, int* ybackground, int* dxbackground) {
     SDL_Texture* texturefond1 = loadTexture("../Image/Background/parallax-space-backgound.png", renderer);
     SDL_Texture* texturefond2 = loadTexture("../Image/Background/parallax-space-stars.png", renderer);
 
     renderTexture(texturefond1, renderer, 0, 0, 1920, 1080);
-    renderTexture(texturefond2, renderer, 0, 0, 1920, 1080);
+    renderTexture(texturefond2, renderer, *xbackground, *ybackground, 1920, 1080);
+    *xbackground += *dxbackground;
+    if (*xbackground<=(- 1920)) {
+        *xbackground = 1920;
+    }
 }
 
 
@@ -220,46 +224,41 @@ int main() {
     int player1_left = 0;
     int player1_right = 0;
     int player1_shoot = 0;
-
     // Position et dimension des joueurs
     int x = 200;
-    int y = 200;
+    int y = 500;
     int largeurplayer = 100;
     int longueurplayer = 100;
-
     // Vitesse de déplacement
     int dy = 10;
     int dx = 10;
 
+    //variable background
+    int xbackground = 0;
+    int ybackground = 0;
+    int dxbackground = -1;
+    
     // Tableau de lasers
     SDL_Rect lasers[MAX_LASER];
     int laserCount = 0;
-
     // Variable pour la boucle principale
     int continuer = 1;
-
-    // Initialisation de SDL
+    
+    // Initialisation
     initSDL();
-
-    // Création de la fenêtre
     SDL_Window* window = initWindow();
-
-    // Création du rendu
     SDL_Renderer* renderer = initRenderer(window);
-
-    // Initialisation de SDL_ttf
     initTTF();
 
     // Chargement des textures
     SDL_Texture* textureplayer = loadTexture("../Image/Player1.png", renderer);
-    
 
     // Boucle principale
     while (continuer) {
         // Effacement du rendu
         clearRenderer(renderer);
 
-        tapisbackground(renderer);
+        tapisbackground(renderer, &xbackground, &ybackground, &dxbackground);
 
 
         // Gestion des événements et des mouvements
@@ -283,8 +282,6 @@ int main() {
 
         // Mettre à jour l'affichage
         SDL_RenderPresent(renderer);
-
-        // Pause courte pour éviter une utilisation excessive du processeur
         SDL_Delay(10);
     }
 
