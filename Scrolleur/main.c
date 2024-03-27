@@ -23,7 +23,7 @@ SDL_Window* initWindow() {
     // Création de la fenêtre SDL
     SDL_Window* window = SDL_CreateWindow("PING",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        800, 600, SDL_WINDOW_SHOWN);
+        1920, 1080, SDL_WINDOW_SHOWN);
     if (window == NULL) {
         printf("Failed to create window\n");
         SDL_Quit();
@@ -144,7 +144,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
         if (*player1_left && *x >= 0) {
             *x -= dx;
         }
-        else if (*player1_right && *x + longueurplayer <= 800) {
+        else if (*player1_right && *x + longueurplayer <= 1920) {
             *x += dx;
         }
         // Gestion des tirs de laser
@@ -156,11 +156,11 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
         }
         *y -= dy;
     }
-    else if (*player1_down && *y + largeurplayer <= 600) {
+    else if (*player1_down && *y + largeurplayer <= 1080) {
         if (*player1_left && *x >= 0) {
             *x -= dx;
         }
-        else if (*player1_right && *x + longueurplayer <= 800) {
+        else if (*player1_right && *x + longueurplayer <= 1920) {
             *x += dx;
         }
         // Gestion des tirs de laser
@@ -182,7 +182,7 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
         }
         *x -= dx;
     }
-    else if (*player1_right && *x + longueurplayer <= 800) {
+    else if (*player1_right && *x + longueurplayer <= 1920) {
         // Gestion des tirs de laser
         if (*player1_shoot && *laserCount < MAX_LASER && elapsedTime >= shootDelay) {
             SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
@@ -200,6 +200,17 @@ void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* pl
         lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
     }
 }
+
+
+void tapisbackground(SDL_Renderer* renderer) {
+    SDL_Texture* texturefond1 = loadTexture("../Image/Background/parallax-space-backgound.png", renderer);
+    SDL_Texture* texturefond2 = loadTexture("../Image/Background/parallax-space-stars.png", renderer);
+
+    renderTexture(texturefond1, renderer, 0, 0, 1920, 1080);
+    renderTexture(texturefond2, renderer, 0, 0, 1920, 1080);
+}
+
+
 
 
 int main() {
@@ -239,13 +250,17 @@ int main() {
     // Initialisation de SDL_ttf
     initTTF();
 
-    // Chargement de la texture du joueur
-    SDL_Texture* texture = loadTexture("C:/Users/quant/OneDrive/Documents/GitHub/JeuxC_RType/Image/Player1.png", renderer);
+    // Chargement des textures
+    SDL_Texture* textureplayer = loadTexture("../Image/Player1.png", renderer);
+    
 
     // Boucle principale
     while (continuer) {
         // Effacement du rendu
         clearRenderer(renderer);
+
+        tapisbackground(renderer);
+
 
         // Gestion des événements et des mouvements
         controller(renderer, &continuer, &player1_up, &player1_down, &player1_left, &player1_right, &player1_shoot, &y, &x, longueurplayer, largeurplayer, dy, dx, lasers, &laserCount);
@@ -255,7 +270,7 @@ int main() {
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
             SDL_RenderFillRect(renderer, &lasers[i]);
             lasers[i].x += DX_LASER;
-            if (lasers[i].x > 800) {
+            if (lasers[i].x > 1920) {
                 // Supprimer le laser qui a quitté l'écran en le remplaçant par le dernier laser du tableau
                 lasers[i] = lasers[laserCount - 1];
                 laserCount--;
@@ -263,7 +278,8 @@ int main() {
         }
 
         // Dessiner le joueur
-        renderTexture(texture, renderer, x, y, longueurplayer, largeurplayer);
+        
+        renderTexture(textureplayer, renderer, x, y, longueurplayer, largeurplayer);
 
         // Mettre à jour l'affichage
         SDL_RenderPresent(renderer);
