@@ -11,6 +11,8 @@
 #define LARGEUR_LASER 10
 #define DX_LASER 20
 #define MAX_LASER 10
+#define LONGUEURPLAYER 100
+#define LARGEURPLAYER 100
 
 void initSDL() {
     // Initialisation de SDL
@@ -131,7 +133,7 @@ SDL_Rect draw(SDL_Renderer* renderer, int x, int y, int longueurplayer, int larg
     return gameobj;
 }
 
-void mouvement(SDL_Event evenement, int* player1_up, int* player1_down, int* player1_right, int* player1_left, int* player1_shoot, int valeur) {
+void action(SDL_Event evenement, int* player1_up, int* player1_down, int* player1_right, int* player1_left, int* player1_shoot, int valeur) {
     switch (evenement.key.keysym.sym) {
     case SDLK_z:
         *player1_up = valeur;
@@ -151,95 +153,103 @@ void mouvement(SDL_Event evenement, int* player1_up, int* player1_down, int* pla
     }
 }
 
-void controller(SDL_Renderer* renderer, int* continuer, int* player1_up, int* player1_down, int* player1_left, int* player1_right, int* player1_shoot, int* y, int* x, int longueurplayer, int largeurplayer, int dy, int dx, SDL_Rect* lasers, int* laserCount, Mix_Chunk* laserbeam) {
-    static int shootDelay = 300; // Délai entre chaque tir en millisecondes
-    static Uint32 lastShootTime = 0; // Temps du dernier tir
+
+
+int creerLaser(int* x, int* y, int laserCount, Uint32* lastShootTime,
+    int  player1_shoot, int shootDelay, Uint32 elapsedTime, SDL_Rect* lasers,
+    Mix_Chunk* laserbeam) {
+
+    if (player1_shoot) {
+        SDL_Rect laser = { *x + LONGUEURPLAYER, *y + (LARGEURPLAYER / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
+        Uint32 currentTime = SDL_GetTicks();
+        if (player1_shoot && laserCount < MAX_LASER && elapsedTime >= shootDelay) {
+            lasers[laserCount] = laser;
+            (laserCount) += 1;
+            *lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
+            Mix_PlayChannel(-1, laserbeam, 1);
+        }
+    }// creerLaser prend pas directement l'emplacement memoire de laserCount il prend sa valeur qu'il retourne apres avoir fais son travail
+    return laserCount;
+}
+
+void controller(int* continuer, int* player1_up, int* player1_down, int* player1_left, int* player1_right, int* player1_shoot) {
     // Gestion des événements
     SDL_Event event;
 
-    // Calcul du temps écoulé depuis le dernier tir en millisecondes
-    Uint32 currentTime = SDL_GetTicks();
-    Uint32 elapsedTime = currentTime - lastShootTime;
-    
     // Récupération de tous les événements en attente
     while (SDL_PollEvent(&event) != 0) {
         if (event.type == SDL_QUIT) {
             *continuer = 0;
         }
         else if (event.type == SDL_KEYDOWN) {
-            mouvement(event, player1_up, player1_down, player1_right, player1_left, player1_shoot, 1);
+            action(event, player1_up, player1_down, player1_right,
+                player1_left, player1_shoot, 1);
         }
         else if (event.type == SDL_KEYUP) {
-            mouvement(event, player1_up, player1_down, player1_right, player1_left, player1_shoot, 0);
+            action(event, player1_up, player1_down, player1_right,
+                player1_left, player1_shoot, 0);
         }
-    }
-
-    // Gestion des mouvements des joueurs
-    if (*player1_up && *y >= 0) {
-        if (*player1_left && *x >= 0) {
-            *x -= dx;
-        }
-        else if (*player1_right && *x + longueurplayer <= 1920) {
-            *x += dx;
-        }
-        // Gestion des tirs de laser
-        if (*player1_shoot && *laserCount < MAX_LASER && elapsedTime >= shootDelay) {
-            SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
-            lasers[*laserCount] = laser;
-            *laserCount += 1;
-            lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
-            Mix_PlayChannel(-1,laserbeam, 0);
-        }
-        *y -= dy;
-    }
-    else if (*player1_down && *y + largeurplayer <= 1080) {
-        if (*player1_left && *x >= 0) {
-            *x -= dx;
-        }
-        else if (*player1_right && *x + longueurplayer <= 1920) {
-            *x += dx;
-        }
-        // Gestion des tirs de laser
-        if (*player1_shoot && *laserCount < MAX_LASER && elapsedTime >= shootDelay) {
-            SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
-            lasers[*laserCount] = laser;
-            *laserCount += 1;
-            lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
-            Mix_PlayChannel(-1,laserbeam, 0);
-        }
-        *y += dy;
-    }
-    else if (*player1_left && *x >= 0) {
-        // Gestion des tirs de laser
-        if (*player1_shoot && *laserCount < MAX_LASER && elapsedTime >= shootDelay) {
-            SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
-            lasers[*laserCount] = laser;
-            *laserCount += 1;
-            lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
-            Mix_PlayChannel(-1,laserbeam, 0);
-        }
-        *x -= dx;
-    }
-    else if (*player1_right && *x + longueurplayer <= 1920) {
-        // Gestion des tirs de laser
-        if (*player1_shoot && *laserCount < MAX_LASER && elapsedTime >= shootDelay) {
-            SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
-            lasers[*laserCount] = laser;
-            *laserCount += 1;
-            lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
-            Mix_PlayChannel(-1,laserbeam, 0);
-        }
-        *x += dx;
-    }
-    // Gestion des tirs de laser
-    else if (*player1_shoot && *laserCount < MAX_LASER && elapsedTime >= shootDelay) {
-        SDL_Rect laser = { *x + longueurplayer, *y + (largeurplayer / 2) - (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
-        lasers[*laserCount] = laser;
-        *laserCount += 1;
-        lastShootTime = currentTime; // Mettre à jour le temps du dernier tir
-        Mix_PlayChannel(-1,laserbeam, 0);
     }
 }
+
+
+int deplacementDiagonale(int player1_left, int player1_right, int x) {
+    if (player1_left && x >= 0) {
+        x -= 10;
+    }
+    else if (player1_right && x + LONGUEURPLAYER <= 1920) {
+        x += 10;
+    }
+    return x;
+}
+
+void deplacement(int* y, int* x, int* laserCount, int player1_shoot, int player1_up
+    , int player1_left, int player1_down, int player1_right, SDL_Rect* lasers,
+    Mix_Chunk* laserbeam) {
+    static int shootDelay = 300; // Délai entre chaque tir en millisecondes
+    static Uint32 lastShootTime = 0; // Temps du dernier tir
+    Uint32 currentTime = SDL_GetTicks();  // Calcul du temps écoulé depuis le dernier tir en millisecondes
+    Uint32 elapsedTime = currentTime - lastShootTime;
+
+    if (player1_up && *y >= 0) {
+        *x = deplacementDiagonale(player1_left, player1_right, *x);
+        *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
+            player1_shoot, shootDelay, elapsedTime, lasers,laserbeam);
+        *y -= 10;
+    }else if (player1_down && *y + LARGEURPLAYER <= 1080) {
+        *x = deplacementDiagonale(player1_left, player1_right, *x);
+        *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
+            player1_shoot, shootDelay, elapsedTime, lasers,laserbeam);
+        *y += 10;
+    }else if (player1_left && *x >= 0) {
+        *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
+            player1_shoot, shootDelay, elapsedTime, lasers,laserbeam);
+        *x -= 10;
+    }else if (player1_right && *x + LONGUEURPLAYER <= 1920) {
+        *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
+            player1_shoot, shootDelay, elapsedTime, lasers,laserbeam);
+        *x += 10;
+    }else if (player1_shoot) {
+        *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
+            player1_shoot, shootDelay, elapsedTime, lasers,laserbeam);
+    }
+}
+
+void drawLaser(SDL_Renderer* renderer, int* laserCount, SDL_Rect* lasers) {
+    for (int i = 0; i < *laserCount; ++i) {
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &lasers[i]);
+        lasers[i].x += DX_LASER;
+        if (lasers[i].x > 1920) {
+            // Supprimer le laser qui a quitté l'écran en le remplaçant par le dernier laser du tableau
+            lasers[i] = lasers[*laserCount - 1];
+            (*laserCount)--;
+        }
+    }
+}
+
+
+
 
 
 void tapisbackground(SDL_Renderer* renderer, int* xbackground, int* ybackground, int* xbackgroundplanet, int* xbackgroundetoile) {
@@ -279,34 +289,36 @@ void tapisbackground(SDL_Renderer* renderer, int* xbackground, int* ybackground,
 
 
 
-int main() {
-    // Variables de mouvement des joueurs
-    int player1_up = 0;
-    int player1_down = 0;
-    int player1_left = 0;
-    int player1_right = 0;
-    int player1_shoot = 0;
-    // Position et dimension des joueurs
-    int x = 200;
-    int y = 500;
-    int largeurplayer = 100;
-    int longueurplayer = 100;
-    // Vitesse de déplacement
-    int dy = 10;
-    int dx = 10;
+// Variables de mouvement des joueurs
+int player1_up = 0;
+int player1_down = 0;
+int player1_left = 0;
+int player1_right = 0;
+int player1_shoot = 0;
+// Position et dimension des joueurs
+int x = 200;
+int y = 500;
+int largeurplayer = 100;
+int longueurplayer = 100;
+// Vitesse de déplacement
+int dy = 10;
+int dx = 10;
 
-    //variable background
-    int xbackground = 0;
-    int ybackground = 0;
-    int xbackgroundplanet = 0;
-    int xbackgroundetoile = 2000;
-    
-    
-    // Tableau de lasers
-    SDL_Rect lasers[MAX_LASER];
-    int laserCount = 0; 
-    // Variable pour la boucle principale
-    int continuer = 1;
+//variable background
+int xbackground = 0;
+int ybackground = 0;
+int xbackgroundplanet = 0;
+int xbackgroundetoile = 2000;
+
+
+// Tableau de lasers
+SDL_Rect lasers[MAX_LASER];
+int laserCount = 0;
+// Variable pour la boucle principale
+int continuer = 1;
+
+int main() {
+
     
     // Initialisation
     initSDL();
@@ -328,26 +340,22 @@ int main() {
         // Effacement du rendu
         clearRenderer(renderer);
 
-        tapisbackground(renderer, &xbackground, &ybackground, &xbackgroundplanet, &xbackgroundetoile);
+        tapisbackground(renderer, &xbackground, &ybackground, 
+            &xbackgroundplanet, &xbackgroundetoile);
 
 
         // Gestion des événements et des mouvements
-        controller(renderer, &continuer, &player1_up, &player1_down, &player1_left, &player1_right, &player1_shoot, &y, &x, longueurplayer, largeurplayer, dy, dx, lasers, &laserCount, laserbeam);
+
+        controller(&continuer, &player1_up, &player1_down, &player1_left, 
+            &player1_right, &player1_shoot);
+        deplacement(&y, &x, &laserCount, player1_shoot, player1_up,
+            player1_left, player1_down, player1_right, lasers,laserbeam);
 
         // Gestion des lasers
-        for (int i = 0; i < laserCount; ++i) {
-            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-            SDL_RenderFillRect(renderer, &lasers[i]);
-            lasers[i].x += DX_LASER;
-            if (lasers[i].x > 1920) {
-                // Supprimer le laser qui a quitté l'écran en le remplaçant par le dernier laser du tableau
-                lasers[i] = lasers[laserCount - 1];
-                laserCount--;
-            }
-        }
+        drawLaser(renderer, &laserCount, lasers);
 
         // Dessiner le joueur
-        
+
         renderTexture(textureplayer, renderer, x, y, longueurplayer, largeurplayer);
 
         // Mettre à jour l'affichage
