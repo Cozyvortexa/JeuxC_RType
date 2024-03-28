@@ -108,6 +108,7 @@ Mix_Music* loadMusic(const char* path) {
     }
     return musique;
 }
+//comme load music mais pour les bruitages
 Mix_Chunk* loadSon(const char* path) {
     Mix_Chunk* son = Mix_LoadWAV(path);
     if (!son) {
@@ -318,10 +319,10 @@ int main() {
     SDL_Texture* textureplayer = loadTexture("../Image/Player1.png", renderer);
     Mix_Music* musique = loadMusic("../Son/8-Bit Robotics.wav");
     Mix_Chunk* laserbeam = loadSon("../Son/laser-gun.wav");
+    Mix_Chunk* explosion = loadSon("../Son/explosion.wav"); //bruitages pour l'explosion des vaisseau
+
+
     Mix_PlayMusic(musique, -1);
-
-
-
     // Boucle principale
     while (continuer) {
         // Effacement du rendu
