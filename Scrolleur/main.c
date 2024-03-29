@@ -7,13 +7,14 @@
 #include <time.h>
 
 
-#define LONGUEUR_LASER 10
+#define LONGUEUR_LASER 40
 #define LARGEUR_LASER 10
 #define DX_LASER 20
 #define MAX_LASER 10
 #define LONGUEURPLAYER 100
 #define LARGEURPLAYER 100
 #define MAX_ENNEMIS 10
+
 
 void initSDL() {
     // Initialisation de SDL
@@ -70,6 +71,52 @@ int initTTF() {
         exit(1);
     }
     return 0;
+}
+
+TTF_Font* loadFont() {
+    TTF_Font* font = TTF_OpenFont("../Font/ARCADECLASSIC.TTF", 12);
+    if (font == NULL) {
+        fprintf(stderr, "Erreur lors du chargement de la police: %s\n",
+            TTF_GetError());
+        TTF_Quit();
+        return NULL;
+    }
+    return font;
+}
+
+void afficherText(const char* text, SDL_Renderer* renderer) {
+    TTF_Font* font = loadFont();
+    // Création de la couleur
+    SDL_Color noir = { 0, 0, 0 };
+
+    // Rendu du texte
+    SDL_Surface* texteSurface = TTF_RenderText_Solid(font, text, noir);
+    if (texteSurface == NULL) {
+        fprintf(stderr, "Erreur lors du rendu du texte: %s\n", TTF_GetError());
+        TTF_CloseFont(font);
+        return;
+    }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, texteSurface);
+    if (texture == NULL) {
+        fprintf(stderr, "Erreur lors de la création de la texture du texte: %s\n", SDL_GetError());
+        SDL_FreeSurface(texteSurface);
+        TTF_CloseFont(font);
+        return;
+    }
+
+    // Positionnement du texte à l'écran (par exemple, au centre)
+    int textWidth = 1000;
+    int textHeight = 200;
+    SDL_Rect destRect = { (1920 - textWidth) / 2 , 100, textWidth, textHeight };
+
+    // Affichage du texte à l'écran
+    SDL_RenderCopy(renderer, texture, NULL, &destRect);
+
+    // Libération des ressources
+    SDL_FreeSurface(texteSurface);
+    SDL_DestroyTexture(texture);
+    TTF_CloseFont(font);
 }
 
 struct Joueurs {
@@ -192,7 +239,7 @@ int creerLaser(int* x, int* y, int laserCount, Uint32* lastShootTime,
 
     if (player1_shoot) {
         SDL_Rect laser = { *x + LONGUEURPLAYER, *y + (LARGEURPLAYER / 2) -
-            (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
+            (LARGEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
         Uint32 currentTime = SDL_GetTicks();
         if (player1_shoot && laserCount < MAX_LASER && elapsedTime >= shootDelay) {
             lasers[laserCount] = laser;
@@ -275,7 +322,7 @@ void deplacement(int* y, int* x, int* laserCount, int player1_shoot, int player1
 
 void drawLaser(SDL_Renderer* renderer, int* laserCount, SDL_Rect* lasers) {
     for (int i = 0; i < *laserCount; ++i) {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderFillRect(renderer, &lasers[i]);
         lasers[i].x += DX_LASER;
         if (lasers[i].x > 1920) {
@@ -348,34 +395,42 @@ SDL_Texture* drawEntite(SDL_Renderer* renderer, const char* lien) {  // Permet d
     return spriteTexture;
 }
 
+void freeBackground(SDL_Texture* texturefond, SDL_Texture* texturepoudre,
+    SDL_Texture* textureplanetloin, SDL_Texture* textureetoile,
+    SDL_Texture* textureplanetproche) {
+    SDL_DestroyTexture(texturefond);
+    SDL_DestroyTexture(texturepoudre);
+    SDL_DestroyTexture(textureplanetloin);
+    SDL_DestroyTexture(textureetoile);
+    SDL_DestroyTexture(textureplanetproche);
+}
 
-void tapisbackground(SDL_Renderer* renderer, int* xbackground,
-    int* ybackground, int* xbackgroundplanet, int* xbackgroundetoile) {
+void tapisBackground(SDL_Renderer* renderer, int* xbackground, int* ybackground
+    , int* xbackgroundplanet, int* xbackgroundetoile) {
     int dxstar = -3;
     int dxplanetloin = -2;
     int dxetoile = -1;
-
-    SDL_Texture* texturefond = loadTexture(
-        "../Image/Background/parallax-space-backgound.png", renderer);
-    SDL_Texture* texturepoudre = loadTexture(
-        "../Image/Background/parallax-space-stars.png", renderer);
-    SDL_Texture* textureplanetloin = loadTexture(
-        "../Image/Background/parallax-space-far-planets.png", renderer);
-    SDL_Texture* textureetoile = loadTexture(
-        "../Image/Background/parallax-space-ring-planet.png", renderer);
-    SDL_Texture* textureplanetproche = loadTexture(
-        "../Image/Background/parallax-space-big-planet.png", renderer);
-
+    SDL_Texture* texturefond = loadTexture
+    ("../Image/Background/parallax-space-backgound.png", renderer);
+    SDL_Texture* texturepoudre = loadTexture
+    ("../Image/Background/parallax-space-stars.png", renderer);
+    SDL_Texture* textureplanetloin = loadTexture
+    ("../Image/Background/parallax-space-far-planets.png", renderer);
+    SDL_Texture* textureetoile = loadTexture
+    ("../Image/Background/parallax-space-ring-planet.png", renderer);
+    SDL_Texture* textureplanetproche = loadTexture
+    ("../Image/Background/parallax-space-big-planet.png", renderer);
     renderTexture(texturefond, renderer, 0, 0, 1920, 1080);
-    renderTexture(textureetoile, renderer, *xbackgroundetoile, *ybackground, 255, 575);
+    renderTexture(textureetoile, renderer, *xbackgroundetoile, *ybackground,
+        255, 575);
     renderTexture(textureplanetproche, renderer, *xbackgroundetoile + 1000,
         *ybackground + 500, 440, 435);
-    renderTexture(textureplanetloin, renderer, *xbackgroundplanet,
-        *ybackground, 1920, 1080);
-    renderTexture(texturepoudre, renderer, *xbackground, *ybackground, 1920, 1080);
-    renderTexture(texturepoudre, renderer, *xbackground + 1920,
-        *ybackground, 1920, 1080);
-
+    renderTexture(textureplanetloin, renderer, *xbackgroundplanet, *ybackground
+        , 1920, 1080);
+    renderTexture(texturepoudre, renderer, *xbackground, *ybackground,
+        1920, 1080);
+    renderTexture(texturepoudre, renderer, *xbackground + 1920, *ybackground,
+        1920, 1080);
     *xbackground += dxstar;
     if (*xbackground <= (-1920)) {
         *xbackground = 0;
@@ -388,6 +443,8 @@ void tapisbackground(SDL_Renderer* renderer, int* xbackground,
     if (*xbackgroundetoile <= (-1920)) {
         *xbackgroundetoile = 1920;
     }
+    freeBackground(texturefond, texturepoudre, textureplanetloin, textureetoile
+        , textureplanetproche);
 }
 
 
@@ -421,6 +478,116 @@ struct Joueurs initJoueur(int x, int y) {
     joueurs.x = x;
     joueurs.y = y;
     return joueurs;
+}
+
+void mouvementMenu(SDL_Event evenement, int* menu_up, int* menu_down,
+    int* menu_select, int valeur) {
+    switch (evenement.key.keysym.sym) {
+    case SDLK_z:
+        *menu_up = valeur;
+        break;
+    case SDLK_s:
+        *menu_down = valeur;
+        break;
+    case SDLK_SPACE:
+        *menu_select = valeur;
+        break;
+    }
+}
+
+void directionUpMenu(int* choix, int* lastSelectTime, int currentTime) {
+    *choix -= 1;
+    if (*choix <= 0) {
+        *choix = 3;
+    }
+    lastSelectTime = currentTime;
+}
+void directionDownMenu(int* choix, int* lastSelectTime, int currentTime) {
+    *choix += 1;
+    if (*choix > 3) {
+        *choix = 1;
+    }
+    lastSelectTime = currentTime;
+}
+
+void controlleurMenu(SDL_Renderer* renderer, int* menu_up, int* menu_down,
+    int* menu_select, int* choix, int* continuer, int* continuermenu,
+    int* boucle) {
+    SDL_Event event;
+    static int selectDelay = 300;
+    static Uint32 lastSelectTime = 0;
+
+    while (SDL_PollEvent(&event) != 0) {
+        Uint32 currentTime = SDL_GetTicks();
+        Uint32 elapsedTime = currentTime - lastSelectTime;
+        if (event.type == SDL_QUIT) {
+            *boucle = 0;
+            *continuer = 0;
+            *continuermenu = 0;
+        }
+        else if (event.type == SDL_KEYDOWN) {
+            mouvementMenu(event, menu_up, menu_down, menu_select, 1);
+        }
+        else if (event.type == SDL_KEYUP) {
+            mouvementMenu(event, menu_up, menu_down, menu_select, 0);
+
+        }if (*menu_up && elapsedTime >= selectDelay) {
+            directionUpMenu(&choix, &lastSelectTime, currentTime);
+        }
+        else if (*menu_down && elapsedTime >= selectDelay) {
+            directionDownMenu(&choix, &lastSelectTime, currentTime);
+        }
+        else if (*menu_select) {
+            *boucle = 0;
+        }
+    }
+}
+
+void traitementChoix(int choix, int* continuermenu, int* continuer) {
+    switch (choix) {
+    case 1: //lancer le jeu
+        printf("choix 1");
+        *continuermenu = 0;
+        *continuer = 1;
+        break;
+    case 2: //paramètre
+        printf("choix 2"); //ne fait pas je l'ai pas encore fait
+        //parametre();
+        break;
+    case 3: //quitter
+        printf("choix 3");
+        *continuermenu = 0;
+        *continuer = 0;
+        break;
+    }
+
+}
+
+void menu(SDL_Renderer* renderer, SDL_Texture* textureplayer, int x, int y,
+    int xbackground, int ybackground, int xbackgroundplanet,
+    int xbackgroundetoile, int* continuer) {
+    int continuermenu = 1;
+    int boucle = 1;
+    int menu_up = 0;
+    int menu_down = 0;
+    int menu_select = 0;
+    int choix = 1;
+    while (continuermenu) {
+        while (boucle) {
+            clearRenderer(renderer);
+            tapisBackground(renderer, &xbackground, &ybackground,
+                &xbackgroundplanet, &xbackgroundetoile);
+            renderTexture(textureplayer, renderer, x, y,
+                LONGUEURPLAYER, LARGEURPLAYER);
+            afficherText("Starforce Strike", renderer);
+            controlleurMenu(renderer, &menu_up, &menu_down, &menu_select,
+                &choix, continuer, &continuermenu, &boucle);
+            SDL_RenderPresent(renderer);
+            SDL_Delay(10);
+        }if (continuermenu) {
+            traitementChoix(choix, &continuermenu, continuer);
+        }
+    }
 }
 
 // Variables de mouvement des joueurs
@@ -475,9 +642,12 @@ int main() {
 
     // Chargement des textures et des sons
     SDL_Texture* textureplayer = loadTexture("../Image/Player1.png", renderer);
+
     Mix_Music* musique = loadMusic("../Son/8-Bit Robotics.wav");
     Mix_Chunk* laserbeam = loadSon("../Son/laser-gun.wav");
     Mix_Chunk* explosion = loadSon("../Son/explosion.wav"); //bruitages pour l'explosion des vaisseau
+
+    menu(renderer, textureplayer, x, y, &xbackground, ybackground, &xbackgroundplanet, &xbackgroundetoile, &continuer);
 
     SDL_Texture* spriteTexture = drawEntite(renderer,
         "../Image/ennemieVaisseau.bmp");
@@ -494,7 +664,7 @@ int main() {
         // Effacement du rendu
         clearRenderer(renderer);
 
-        tapisbackground(renderer, &xbackground, &ybackground,
+        tapisBackground(renderer, &xbackground, &ybackground,
             &xbackgroundplanet, &xbackgroundetoile);
 
 
