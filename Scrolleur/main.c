@@ -84,7 +84,7 @@ TTF_Font* loadFont() {
     return font;
 }
 
-void afficherText(const char* text, SDL_Renderer* renderer) {
+void afficherText(const char* text, SDL_Renderer* renderer, int yText, int textWidth, int textHeight) {
     TTF_Font* font = loadFont();
     // Création de la couleur
     SDL_Color noir = { 0, 0, 0 };
@@ -106,9 +106,7 @@ void afficherText(const char* text, SDL_Renderer* renderer) {
     }
 
     // Positionnement du texte à l'écran (par exemple, au centre)
-    int textWidth = 1000;
-    int textHeight = 200;
-    SDL_Rect destRect = { (1920 - textWidth) / 2 , 100, textWidth, textHeight };
+    SDL_Rect destRect = { (1920 - textWidth) / 2, yText, textWidth, textHeight };
 
     // Affichage du texte à l'écran
     SDL_RenderCopy(renderer, texture, NULL, &destRect);
@@ -579,7 +577,7 @@ void menu(SDL_Renderer* renderer, SDL_Texture* textureplayer, int x, int y,
                 &xbackgroundplanet, &xbackgroundetoile);
             renderTexture(textureplayer, renderer, x, y,
                 LONGUEURPLAYER, LARGEURPLAYER);
-            afficherText("Starforce Strike", renderer);
+            afficherText("Starforce Strike", renderer, 100, 1000, 200);
             controlleurMenu(renderer, &menu_up, &menu_down, &menu_select,
                 &choix, continuer, &continuermenu, &boucle);
             SDL_RenderPresent(renderer);
@@ -614,6 +612,8 @@ int xbackgroundetoile = 2000;
 
 
 
+
+
 static int hitDelay = 3000;
 static Uint32 lasthitTime = 0;
 
@@ -632,6 +632,7 @@ struct Ennemi ennemis[MAX_ENNEMIS];
 
 int main() {
 
+   
 
     // Initialisation
     initSDL();
