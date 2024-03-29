@@ -42,13 +42,16 @@ void tapisBackground(SDL_Renderer* renderer, int* xbackground, int* ybackground
     SDL_Texture*textureetoile=loadTexture("../Image/ring-pla.png", renderer);
     SDL_Texture* texturebigpla = loadTexture("../Image/big-pla.png", renderer);
     renderTexture(texturefond, renderer, 0, 0, 1920, 1080);
-    renderTexture(textureetoile, renderer, *xbackgroundetoile, *ybackground, 255, 575);
+    renderTexture(textureetoile, renderer, *xbackgroundetoile,
+        *ybackground, 255, 575);
     renderTexture(texturebigpla, renderer, *xbackgroundetoile,
         *ybackground + 500, 440, 435);
     renderTexture(textureplanetloin, renderer, *xbackgroundplanet,
         *ybackground, 1920, 1080);
-    renderTexture(texturepoudre, renderer, *xbackground, *ybackground, 1920, 1080);
-    renderTexture(texturepoudre, renderer, *xbackground + 1920, *ybackground, 1920, 1080);
-    freeBackground(texturefond,texturepoudre,textureplanetloin,textureetoile,texturebigpla);
+    renderTexture(texturepoudre,renderer,*xbackground,*ybackground,1920,1080);
+    renderTexture(texturepoudre, renderer, *xbackground + 1920,
+        *ybackground, 1920, 1080);
+    freeBackground(texturefond,texturepoudre,
+        textureplanetloin,textureetoile,texturebigpla);
 }
 
