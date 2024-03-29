@@ -10,5 +10,6 @@ void mouvementEnnemi(struct Ennemie* ennemis, int nbrEnnemie, int vitesse);
 
 int freeEnnemi(struct Ennemi* ennemis, int nbrEnnemie);
 
-void initVague(struct Ennemie* ennemis, SDL_Renderer* renderer, int nbrEnnemie, const char* sprite, int score);
+void initVague(struct Ennemie* ennemis, SDL_Renderer* renderer, int nbrEnnemie,
+	const char* sprite, int score);
 #endif

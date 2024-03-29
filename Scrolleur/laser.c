@@ -15,7 +15,8 @@
 #define LONGUEURPLAYER 100
 #define LARGEURPLAYER 100
 
-SDL_Rect draw(SDL_Renderer* renderer, int x, int y, int longueurplayer, int largeurplayer, int R, int G, int B) {
+SDL_Rect draw(SDL_Renderer* renderer, int x, int y, int longueurplayer,
+    int largeurplayer, int R, int G, int B) {
     SDL_Rect gameobj = { x, y, longueurplayer, largeurplayer };
     SDL_SetRenderDrawColor(renderer, R, G, B, 255);
     SDL_RenderFillRect(renderer, &gameobj);
@@ -30,7 +31,7 @@ int creerLaser(int* x, int* y, int laserCount, Uint32* lastShootTime,
         SDL_Rect laser = { *x + LONGUEURPLAYER, *y + (LARGEURPLAYER / 2) -
             (LARGEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
         Uint32 currentTime = SDL_GetTicks();
-        if (player1_shoot && laserCount < MAX_LASER && elapsedTime >= shootDelay) {
+        if (player1_shoot && laserCount <MAX_LASER && elapsedTime>=shootDelay){
             lasers[laserCount] = laser;
             (laserCount) += 1;
             *lastShootTime = currentTime; // Mettre à jour le temps du dernier tir

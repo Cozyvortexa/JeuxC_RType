@@ -69,7 +69,8 @@ void menu(SDL_Renderer* renderer, SDL_Texture* textureplayer, int* x, int* y,
             SDL_Delay(10);
         }
         if (*continuer == 1) { // Utiliser le pointeur continuer ici
-            traitementChoix(choix, &continuer, &continuerMenu, renderer, window, musiqueMenu); // Utiliser le pointeur continuer
+            traitementChoix(choix, &continuer, &continuerMenu, renderer,
+                window, musiqueMenu); // Utiliser le pointeur continuer
         } 
 
 }

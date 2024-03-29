@@ -45,7 +45,8 @@ void touche(struct Ennemi* ennemis, struct Joueurs* joueur, Uint32 lasthitTime,
         }
         if (collision(*x, *y, LONGUEURPLAYER, LARGEUR_LASER,
             ennemis[i].posEtSize.x, ennemis[i].posEtSize.y,
-            ennemis[i].posEtSize.w, ennemis[i].posEtSize.h) && ennemis[i].pv > 0) {
+            ennemis[i].posEtSize.w, ennemis[i].posEtSize.h) &&
+            ennemis[i].pv > 0) {
             Uint32 currentTime = SDL_GetTicks();
             Uint32 elapsedTime = currentTime - lasthitTime;
             if (elapsedTime >= hitDelay) {
@@ -70,7 +71,8 @@ void generateurDeVague(SDL_Renderer* renderer, struct Ennemie* ennemis,
     }
     if (freeEnnemi(ennemis, *nombreEnnemis1) && *triggerVague2 == 1) {
         *triggerVague2 = 2;
-        initVague(ennemis2, renderer, *nombreEnnemis2, "../Image/ennemideux.bmp", 500);
+        initVague(ennemis2, renderer, *nombreEnnemis2,
+            "../Image/ennemideux.bmp", 500);
     }
     if (*triggerVague2 == 2) {
         mouvementEnnemi(ennemis2, *nombreEnnemis2, 4);

@@ -14,7 +14,7 @@
 void scoreAffichage(SDL_Renderer* renderer, int* score, int* nbrVague) {
     char affichageScore[20];
     int scoreAffiche = *score;
-    snprintf(affichageScore, 20, "Vague%d score %d  ", *nbrVague, scoreAffiche);
+    snprintf(affichageScore, 20, "Vague%d score %d  ", *nbrVague,scoreAffiche);
     SDL_Rect posTexte = { 600, 850, 800, 350 };
 
     TTF_Font* font = TTF_OpenFont("../Font/ARCADECLASSIC.ttf", 24);

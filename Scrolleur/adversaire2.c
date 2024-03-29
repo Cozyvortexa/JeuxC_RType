@@ -30,7 +30,8 @@ int collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
     int bottom2 = y2 + h2;
 
     // Vérifier qu'il n'y a aucune condition 
-    if (bottom1 <= top2 || top1 >= bottom2 || right1 <= left2 || left1 >= right2) {
+    if (bottom1 <= top2 || top1 >= bottom2 || right1 <= left2 ||
+        left1 >= right2) {
         return 0;
     }
     return 1;
@@ -42,7 +43,8 @@ SDL_Texture* drawEntite(SDL_Renderer* renderer, const char* lien) {  // Permet d
     if (spriteSurface == NULL) {
         printf("Impossible de charger l'image : %s\n", SDL_GetError());
     }
-    SDL_Texture* spriteTexture = SDL_CreateTextureFromSurface(renderer, spriteSurface);
+    SDL_Texture* spriteTexture = SDL_CreateTextureFromSurface(renderer,
+        spriteSurface);
     SDL_FreeSurface(spriteSurface);
     if (spriteTexture == NULL) {
         printf("Impossible de creer la texture : %s\n", SDL_GetError());
@@ -71,7 +73,8 @@ int freeEnnemi(struct Ennemi* ennemis, int nbrEnnemie) {
     return 0;
 }
 
-void initVague(struct Ennemie* ennemis, SDL_Renderer* renderer, int nbrEnnemie, const char* sprite, int score) {
+void initVague(struct Ennemie* ennemis, SDL_Renderer* renderer,
+    int nbrEnnemie, const char* sprite, int score) {
     SDL_Texture* spriteTexture = drawEntite(renderer, sprite);
     int x = 1920;
     int y = 100;

@@ -18,7 +18,8 @@ struct Joueurs {
     int pv;
 };
 
-void action(SDL_Event evenement, int* player1_up, int* player1_down, int* player1_right, int* player1_left, int* player1_shoot, int valeur) {
+void action(SDL_Event evenement, int* player1_up, int* player1_down,
+    int* player1_right, int* player1_left, int* player1_shoot, int valeur) {
     switch (evenement.key.keysym.sym) {
     case SDLK_z:
         *player1_up = valeur;
@@ -76,30 +77,25 @@ void deplacement(int* y, int* x, int* laserCount, int player1_shoot, int player1
     static Uint32 lastShootTime = 0; // Temps du dernier tir
     Uint32 currentTime = SDL_GetTicks();  // Calcul du temps écoulé depuis le dernier tir en millisecondes
     Uint32 elapsedTime = currentTime - lastShootTime;
-
     if (player1_up && *y >= 0) {
         *x = deplacementDiagonale(player1_left, player1_right, *x);
         *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
             player1_shoot, shootDelay, elapsedTime, lasers, laserbeam);
         *y -= 10;
-    }
-    else if (player1_down && *y + LARGEURPLAYER <= 1080) {
+    }else if (player1_down && *y + LARGEURPLAYER <= 1080) {
         *x = deplacementDiagonale(player1_left, player1_right, *x);
         *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
             player1_shoot, shootDelay, elapsedTime, lasers, laserbeam);
         *y += 10;
-    }
-    else if (player1_left && *x >= 0) {
+    }else if (player1_left && *x >= 0) {
         *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
             player1_shoot, shootDelay, elapsedTime, lasers, laserbeam);
         *x -= 10;
-    }
-    else if (player1_right && *x + LONGUEURPLAYER <= 1920) {
+    }else if (player1_right && *x + LONGUEURPLAYER <= 1920) {
         *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
             player1_shoot, shootDelay, elapsedTime, lasers, laserbeam);
         *x += 10;
-    }
-    else if (player1_shoot) {
+    }else if (player1_shoot) {
         *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
             player1_shoot, shootDelay, elapsedTime, lasers, laserbeam);
     }

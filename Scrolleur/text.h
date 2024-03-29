@@ -7,10 +7,12 @@ int initTTF();
 TTF_Font* loadFont();
 
 
-void afficherText(const char* text, SDL_Renderer* renderer, int yText, int textWidth, int textHeight);
+void afficherText(const char* text, SDL_Renderer* renderer, int yText,
+	int textWidth, int textHeight);
 
 SDL_Texture* loadTexture(const char* path, SDL_Renderer* renderer);
 
-void renderTexture(SDL_Texture* texture, SDL_Renderer* renderer, int x, int y, int width, int height);
+void renderTexture(SDL_Texture* texture, SDL_Renderer* renderer, int x,
+	int y, int width, int height);
 
 #endif

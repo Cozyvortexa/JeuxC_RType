@@ -51,8 +51,11 @@ struct Ennemi initEnnemi(int id, int pv, int x, int y, int w, int h,
 void display(struct Ennemi* ennemis, int nombreEnnemis, SDL_Renderer* renderer) {
     for (int i = 0; i < nombreEnnemis; i++) {
         if (ennemis[i].enVie != 0) {
-            SDL_Rect constructeur = { ennemis[i].posEtSize.x, ennemis[i].posEtSize.y, ennemis[i].posEtSize.w, ennemis[i].posEtSize.h };
-            SDL_RenderCopy(renderer, ennemis[i].spriteTexture, NULL, &constructeur);
+            SDL_Rect constructeur = { ennemis[i].posEtSize.x,
+                ennemis[i].posEtSize.y, ennemis[i].posEtSize.w,
+                ennemis[i].posEtSize.h };
+            SDL_RenderCopy(renderer, ennemis[i].spriteTexture, NULL,
+                &constructeur);
         }
     }
 }
