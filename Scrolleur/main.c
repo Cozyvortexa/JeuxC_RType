@@ -73,7 +73,8 @@ int initTTF() {
 }
 
 struct Joueurs {
-    int id;
+    int x;
+    int y;
     int pv;
 };
 
@@ -190,7 +191,7 @@ int creerLaser(int* x, int* y, int laserCount, Uint32* lastShootTime,
     Mix_Chunk* laserbeam) {
 
     if (player1_shoot) {
-        SDL_Rect laser = { *x + LONGUEURPLAYER, *y + (LARGEURPLAYER / 2) - 
+        SDL_Rect laser = { *x + LONGUEURPLAYER, *y + (LARGEURPLAYER / 2) -
             (LONGUEUR_LASER / 2), LONGUEUR_LASER, LARGEUR_LASER };
         Uint32 currentTime = SDL_GetTicks();
         if (player1_shoot && laserCount < MAX_LASER && elapsedTime >= shootDelay) {
@@ -236,7 +237,7 @@ int deplacementDiagonale(int player1_left, int player1_right, int x) {
     return x;
 }
 
-void deplacement(int* y,int* x,int* laserCount,int player1_shoot,int player1_up
+void deplacement(int* y, int* x, int* laserCount, int player1_shoot, int player1_up
     , int player1_left, int player1_down, int player1_right, SDL_Rect* lasers,
     Mix_Chunk* laserbeam) {
     static int shootDelay = 300; // Délai entre chaque tir en millisecondes
@@ -247,24 +248,28 @@ void deplacement(int* y,int* x,int* laserCount,int player1_shoot,int player1_up
     if (player1_up && *y >= 0) {
         *x = deplacementDiagonale(player1_left, player1_right, *x);
         *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
-            player1_shoot, shootDelay, elapsedTime, lasers,laserbeam);
+            player1_shoot, shootDelay, elapsedTime, lasers, laserbeam);
         *y -= 10;
-    }else if (player1_down && *y + LARGEURPLAYER <= 1080) {
+    }
+    else if (player1_down && *y + LARGEURPLAYER <= 1080) {
         *x = deplacementDiagonale(player1_left, player1_right, *x);
         *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
-            player1_shoot, shootDelay, elapsedTime, lasers,laserbeam);
+            player1_shoot, shootDelay, elapsedTime, lasers, laserbeam);
         *y += 10;
-    }else if (player1_left && *x >= 0) {
+    }
+    else if (player1_left && *x >= 0) {
         *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
-            player1_shoot, shootDelay, elapsedTime, lasers,laserbeam);
+            player1_shoot, shootDelay, elapsedTime, lasers, laserbeam);
         *x -= 10;
-    }else if (player1_right && *x + LONGUEURPLAYER <= 1920) {
+    }
+    else if (player1_right && *x + LONGUEURPLAYER <= 1920) {
         *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
-            player1_shoot, shootDelay, elapsedTime, lasers,laserbeam);
+            player1_shoot, shootDelay, elapsedTime, lasers, laserbeam);
         *x += 10;
-    }else if (player1_shoot) {
+    }
+    else if (player1_shoot) {
         *laserCount = creerLaser(x, y, *laserCount, &lastShootTime,
-            player1_shoot, shootDelay, elapsedTime, lasers,laserbeam);
+            player1_shoot, shootDelay, elapsedTime, lasers, laserbeam);
     }
 }
 
@@ -281,10 +286,10 @@ void drawLaser(SDL_Renderer* renderer, int* laserCount, SDL_Rect* lasers) {
     }
 }
 
-struct Ennemi initEnnemi(int id, int pv, int x, int y, int w, int h, 
+struct Ennemi initEnnemi(int id, int pv, int x, int y, int w, int h,
     SDL_Texture* spriteTexture, int score) { // création d'un Ennemi 
     struct Ennemi newEnnemi;
-    newEnnemi.idEnnemie = id; 
+    newEnnemi.idEnnemie = id;
     newEnnemi.pv = pv;
     newEnnemi.posEtSize.x = x;
     newEnnemi.posEtSize.y = y;
@@ -305,7 +310,7 @@ void display(struct Ennemi* ennemis, int nombreEnnemis, SDL_Renderer* renderer) 
     }
 }
 
-void addEnnemi(struct Ennemi* tableauEnnemis, int id, int pv, int x, 
+void addEnnemi(struct Ennemi* tableauEnnemis, int id, int pv, int x,
     int y, int w, int h, SDL_Texture* spriteTexture, int score) {
     tableauEnnemis[id] = initEnnemi(id, 3, x, y, w, h, spriteTexture, score);
 }
@@ -362,17 +367,17 @@ void tapisbackground(SDL_Renderer* renderer, int* xbackground,
         "../Image/Background/parallax-space-big-planet.png", renderer);
 
     renderTexture(texturefond, renderer, 0, 0, 1920, 1080);
-    renderTexture(textureetoile,renderer,*xbackgroundetoile,*ybackground,255,575);
-    renderTexture(textureplanetproche, renderer, *xbackgroundetoile+1000,
-        *ybackground+500, 440, 435);
+    renderTexture(textureetoile, renderer, *xbackgroundetoile, *ybackground, 255, 575);
+    renderTexture(textureplanetproche, renderer, *xbackgroundetoile + 1000,
+        *ybackground + 500, 440, 435);
     renderTexture(textureplanetloin, renderer, *xbackgroundplanet,
         *ybackground, 1920, 1080);
-    renderTexture(texturepoudre,renderer,*xbackground,*ybackground,1920,1080);
-    renderTexture(texturepoudre, renderer, *xbackground+1920,
+    renderTexture(texturepoudre, renderer, *xbackground, *ybackground, 1920, 1080);
+    renderTexture(texturepoudre, renderer, *xbackground + 1920,
         *ybackground, 1920, 1080);
-    
+
     *xbackground += dxstar;
-    if (*xbackground<=(- 1920)) {
+    if (*xbackground <= (-1920)) {
         *xbackground = 0;
     }
     *xbackgroundplanet += dxplanetloin;
@@ -409,6 +414,15 @@ void scoreAffichage(SDL_Renderer* renderer, int* score) {
     TTF_CloseFont(font);
 }
 
+
+struct Joueurs initJoueur(int x, int y) {
+    struct Joueurs joueurs;
+    joueurs.pv = 3;
+    joueurs.x = x;
+    joueurs.y = y;
+    return joueurs;
+}
+
 // Variables de mouvement des joueurs
 int player1_up = 0;
 int player1_down = 0;
@@ -418,8 +432,6 @@ int player1_shoot = 0;
 // Position et dimension des joueurs
 int x = 200;
 int y = 500;
-int largeurplayer = 100;
-int longueurplayer = 100;
 
 // Score
 int score = 0;
@@ -434,15 +446,26 @@ int xbackgroundplanet = 0;
 int xbackgroundetoile = 2000;
 
 
+
+static int hitDelay = 3000;
+static Uint32 lasthitTime = 0;
+
+
+
 // Tableau de lasers
 SDL_Rect lasers[MAX_LASER];
 int laserCount = 0;
 // Variable pour la boucle principale
 int continuer = 1;
 
+// creation struct
+int nombreEnnemis = 1;
+struct Ennemi ennemis[MAX_ENNEMIS];
+
+
 int main() {
 
-    
+
     // Initialisation
     initSDL();
     SDL_Window* window = initWindow();
@@ -456,10 +479,11 @@ int main() {
     Mix_Chunk* laserbeam = loadSon("../Son/laser-gun.wav");
     Mix_Chunk* explosion = loadSon("../Son/explosion.wav"); //bruitages pour l'explosion des vaisseau
 
-    SDL_Texture* spriteTexture = drawEntite(renderer, 
+    SDL_Texture* spriteTexture = drawEntite(renderer,
         "../Image/ennemieVaisseau.bmp");
-    struct Ennemi ennemis[MAX_ENNEMIS];
-    int nombreEnnemis = 1;
+
+    struct Joueurs joueur = initJoueur(x, y);
+
     addEnnemi(ennemis, 0, 3, 800, 100, 100, 100, spriteTexture, 300);
 
 
@@ -470,12 +494,11 @@ int main() {
         // Effacement du rendu
         clearRenderer(renderer);
 
-        tapisbackground(renderer, &xbackground, &ybackground, 
+        tapisbackground(renderer, &xbackground, &ybackground,
             &xbackgroundplanet, &xbackgroundetoile);
 
-        
-        mouvementRectiligneEnnemis(ennemis, 0, 1);
 
+        mouvementRectiligneEnnemis(ennemis, 0, 1);
 
 
 
@@ -483,29 +506,43 @@ int main() {
 
         // Gestion des événements et des mouvements
 
-        controller(&continuer, &player1_up, &player1_down, &player1_left, 
+        controller(&continuer, &player1_up, &player1_down, &player1_left,
             &player1_right, &player1_shoot);
         deplacement(&y, &x, &laserCount, player1_shoot, player1_up,
-            player1_left, player1_down, player1_right, lasers,laserbeam);
+            player1_left, player1_down, player1_right, lasers, laserbeam);
 
 
         for (int i = 0; i < nombreEnnemis; i++) {
             for (int i2 = 0; i2 < laserCount; i2++) {
                 if (collision(ennemis[i].posEtSize.x, ennemis[i].posEtSize.y, ennemis[i].posEtSize.w, ennemis[i].posEtSize.h, lasers[i2].x, lasers[i2].y, lasers[i2].w, lasers[i2].h)) {
-                    printf("Collision %d",i);
+                    lasers[i2] = lasers[laserCount - 1];
+                    (laserCount)--;
                     damage(ennemis, i, 1, &score);
                 }
             }
+            if (collision(x, y, LONGUEURPLAYER, LARGEUR_LASER, ennemis[i].posEtSize.x, ennemis[i].posEtSize.y, ennemis[i].posEtSize.w, ennemis[i].posEtSize.h) && ennemis[i].pv > 0) {
+                Uint32 currentTime = SDL_GetTicks();
+                Uint32 elapsedTime = currentTime - lasthitTime;
+                if (elapsedTime >= hitDelay) {
+                    joueur.pv -= 1;
+                    x = joueur.x;
+                    y = joueur.y;
+                    lasthitTime = currentTime;
+                }
+
+                if (joueur.pv <= 0) {
+                    printf("mort");
+                }
+            }
         }
-        printf("%d\n",score);
-        scoreAffichage(renderer, &score);
+        /*scoreAffichage(renderer, &score);*/
 
         // Gestion des lasers
         drawLaser(renderer, &laserCount, lasers);
 
         // Dessiner le joueur
 
-        renderTexture(textureplayer, renderer, x, y, longueurplayer, largeurplayer);
+        renderTexture(textureplayer, renderer, x, y, LONGUEURPLAYER, LARGEURPLAYER);
 
         // Mettre à jour l'affichage
         SDL_RenderPresent(renderer);
