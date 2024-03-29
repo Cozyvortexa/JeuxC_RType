@@ -87,7 +87,7 @@ TTF_Font* loadFont() {
 void afficherText(const char* text, SDL_Renderer* renderer, int yText, int textWidth, int textHeight) {
     TTF_Font* font = loadFont();
     // Création de la couleur
-    SDL_Color noir = { 0, 0, 0 };
+    SDL_Color noir = { 255, 255, 255 };
 
     // Rendu du texte
     SDL_Surface* texteSurface = TTF_RenderText_Solid(font, text, noir);
@@ -493,26 +493,59 @@ void mouvementMenu(SDL_Event evenement, int* menu_up, int* menu_down,
     }
 }
 
-void directionUpMenu(int* choix, int* lastSelectTime, int currentTime) {
+void directionUpMenu(int* choix, Uint32* lastSelectTime, Uint32 currentTime, int* x, int* y) {
     *choix -= 1;
     if (*choix <= 0) {
         *choix = 3;
     }
-    lastSelectTime = currentTime;
+    *lastSelectTime = currentTime;
+
+    switch (*choix)
+    {
+    case 1:
+        *x = ((1920 - 300) / 2) - 150;
+        *y = 300 + (150 / 2) + 25;
+        break;
+    case 2:
+        *x = ((1920 - 400) / 2) - 200;
+        *y = 500 + (150 / 2) + 25;
+        break;
+    case 3:
+        *x = ((1920 - 500) / 2) - 100;
+        *y = 700 + (150 / 2) + 25;
+        break;
+    }
 }
-void directionDownMenu(int* choix, int* lastSelectTime, int currentTime) {
+
+void directionDownMenu(int* choix, Uint32* lastSelectTime, Uint32 currentTime, int* x, int* y) {
     *choix += 1;
     if (*choix > 3) {
         *choix = 1;
     }
-    lastSelectTime = currentTime;
+    *lastSelectTime = currentTime;
+
+    switch (*choix)
+    {
+    case 1:
+        *x = ((1920 - 300) / 2) - 150;
+        *y = 300 + (150 / 2) + 25;
+        break;
+    case 2:
+        *x = ((1920 - 400) / 2) - 200;
+        *y = 500 + (150 / 2) + 25;
+        break;
+    case 3:
+        *x = ((1920 - 500) / 2) - 100;
+        *y = 700 + (150 / 2) + 25;
+        break;
+    }
 }
 
 void controlleurMenu(SDL_Renderer* renderer, int* menu_up, int* menu_down,
     int* menu_select, int* choix, int* continuer, int* continuermenu,
-    int* boucle) {
+    int* boucle, int* x, int* y) {
     SDL_Event event;
-    static int selectDelay = 300;
+    static int selectDelay = 100;
     static Uint32 lastSelectTime = 0;
 
     while (SDL_PollEvent(&event) != 0) {
@@ -528,17 +561,26 @@ void controlleurMenu(SDL_Renderer* renderer, int* menu_up, int* menu_down,
         }
         else if (event.type == SDL_KEYUP) {
             mouvementMenu(event, menu_up, menu_down, menu_select, 0);
-
-        }if (*menu_up && elapsedTime >= selectDelay) {
-            directionUpMenu(&choix, &lastSelectTime, currentTime);
+        }
+        if (*menu_up && elapsedTime >= selectDelay) {
+            directionUpMenu(choix, &lastSelectTime, currentTime, x, y);
+            printf("%d", *choix);
         }
         else if (*menu_down && elapsedTime >= selectDelay) {
-            directionDownMenu(&choix, &lastSelectTime, currentTime);
+            directionDownMenu(choix, &lastSelectTime, currentTime, x, y);
+            printf("%d", *choix);
         }
         else if (*menu_select) {
             *boucle = 0;
         }
     }
+}
+parametre() {
+    int boucleParametre = 1;
+
+        while (boucleParametre){
+            
+        }
 }
 
 void traitementChoix(int choix, int* continuermenu, int* continuer) {
@@ -549,8 +591,8 @@ void traitementChoix(int choix, int* continuermenu, int* continuer) {
         *continuer = 1;
         break;
     case 2: //paramètre
-        printf("choix 2"); //ne fait pas je l'ai pas encore fait
-        //parametre();
+        printf("choix 2");
+        /*parametre();*/
         break;
     case 3: //quitter
         printf("choix 3");
@@ -558,12 +600,13 @@ void traitementChoix(int choix, int* continuermenu, int* continuer) {
         *continuer = 0;
         break;
     }
-
 }
 
-void menu(SDL_Renderer* renderer, SDL_Texture* textureplayer, int x, int y,
+void menu(SDL_Renderer* renderer, SDL_Texture* textureplayer, int* x, int* y,
     int xbackground, int ybackground, int xbackgroundplanet,
     int xbackgroundetoile, int* continuer) {
+    Mix_Music* musiqueMenu = loadMusic("../Son/StageSelection.wav");
+    Mix_PlayMusic(musiqueMenu, -1);
     int continuermenu = 1;
     int boucle = 1;
     int menu_up = 0;
@@ -575,14 +618,18 @@ void menu(SDL_Renderer* renderer, SDL_Texture* textureplayer, int x, int y,
             clearRenderer(renderer);
             tapisBackground(renderer, &xbackground, &ybackground,
                 &xbackgroundplanet, &xbackgroundetoile);
-            renderTexture(textureplayer, renderer, x, y,
-                LONGUEURPLAYER, LARGEURPLAYER);
-            afficherText("Starforce Strike", renderer, 100, 1000, 200);
+            renderTexture(textureplayer, renderer, *x, *y,
+                LONGUEURPLAYER, LARGEURPLAYER); // Utilisation de *x et *y pour obtenir les valeurs
+            afficherText("Starforce  Strike", renderer, 100, 1000, 200);
+            afficherText("JOUER", renderer, 300, 300, 300);
+            afficherText("PARAMETRE", renderer, 500, 500, 300);
+            afficherText("QUITTER", renderer, 700, 400, 300);
             controlleurMenu(renderer, &menu_up, &menu_down, &menu_select,
-                &choix, continuer, &continuermenu, &boucle);
+                &choix, continuer, &continuermenu, &boucle, x, y); // Utilisation de x et y
             SDL_RenderPresent(renderer);
             SDL_Delay(10);
-        }if (continuermenu) {
+        }
+        if (continuermenu) {
             traitementChoix(choix, &continuermenu, continuer);
         }
     }
@@ -609,10 +656,6 @@ int xbackground = 0;
 int ybackground = 0;
 int xbackgroundplanet = 0;
 int xbackgroundetoile = 2000;
-
-
-
-
 
 static int hitDelay = 3000;
 static Uint32 lasthitTime = 0;
@@ -648,7 +691,7 @@ int main() {
     Mix_Chunk* laserbeam = loadSon("../Son/laser-gun.wav");
     Mix_Chunk* explosion = loadSon("../Son/explosion.wav"); //bruitages pour l'explosion des vaisseau
 
-    menu(renderer, textureplayer, x, y, &xbackground, ybackground, &xbackgroundplanet, &xbackgroundetoile, &continuer);
+    menu(renderer, textureplayer, &x, &y, &xbackground, ybackground, &xbackgroundplanet, &xbackgroundetoile, &continuer);
 
     SDL_Texture* spriteTexture = drawEntite(renderer,
         "../Image/ennemieVaisseau.bmp");
