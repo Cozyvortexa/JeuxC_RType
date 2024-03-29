@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\dev\JeuxC_RType\SDL2_mixer-2.8.0\include;D:\dev\JeuxC_RType\SDL2_image-2.8.2\include;D:\dev\JeuxC_RType\SDL2_ttf-2.22.0\include;D:\dev\JeuxC_RType\SDL2-2.30.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\dev\JeuxC_RType\SDL2_mixer-2.8.0\lib\x64;D:\dev\JeuxC_RType\SDL2_image-2.8.2\lib\x64;D:\dev\JeuxC_RType\SDL2_ttf-2.22.0\lib\x64;D:\dev\JeuxC_RType\SDL2-2.30.1\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\qrecco\Documents\Projet c\SDL2_mixer-2.8.0\include;C:\Users\qrecco\Documents\Projet c\SDL2_image-2.8.2\include;C:\Users\qrecco\Documents\Projet c\SDL2_ttf-devel-2.22.0-VC\SDL2_ttf-2.22.0\include;C:\Users\qrecco\Documents\Projet c\SDL2-2.30.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\qrecco\Documents\Projet c\SDL2_mixer-2.8.0\lib\x64;C:\Users\qrecco\Documents\Projet c\SDL2_image-2.8.2\lib\x64;C:\Users\qrecco\Documents\Projet c\SDL2_ttf-devel-2.22.0-VC\SDL2_ttf-2.22.0\lib\x64;C:\Users\qrecco\Documents\Projet c\SDL2-2.30.1\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -132,7 +132,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="adversaire.c" />
+    <ClCompile Include="adversaire2.c" />
+    <ClCompile Include="adversaire3.c" />
+    <ClCompile Include="background.c" />
+    <ClCompile Include="initgeneral.c" />
+    <ClCompile Include="laser.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="menu.c" />
+    <ClCompile Include="menu2.c" />
+    <ClCompile Include="player.c" />
+    <ClCompile Include="score.c" />
+    <ClCompile Include="son.c" />
+    <ClCompile Include="text.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="adversaire.h" />
+    <ClInclude Include="adversaire2.h" />
+    <ClInclude Include="adversaire3.h" />
+    <ClInclude Include="background.h" />
+    <ClInclude Include="initgeneral.h" />
+    <ClInclude Include="laser.h" />
+    <ClInclude Include="menu.h" />
+    <ClInclude Include="menu2.h" />
+    <ClInclude Include="player.h" />
+    <ClInclude Include="score.h" />
+    <ClInclude Include="son.h" />
+    <ClInclude Include="text.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
